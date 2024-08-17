@@ -9,6 +9,7 @@ import { Button } from './ui/button';
 import { Loader2 } from "lucide-react";
 import { LuExternalLink } from "react-icons/lu";
 import { GoStar } from "react-icons/go";
+import { IoIosArrowDown } from "react-icons/io";
 import {
   Card,
   CardContent,
@@ -129,7 +130,7 @@ export default function Dashboard() {
       {error && <p className='text-red-500'>{error}</p>}
       {c.totalContributions && <p>{c.totalContributions} contributions till now</p>}
 
-      <div className='relative w-full max-w-2xl' ref={heatMapContainerRef}>
+      <div className='relative w-full md:max-w-2xl overflow-hidden' ref={heatMapContainerRef}>
         <HeatMap
           value={contributions}
           width={600}
@@ -177,7 +178,7 @@ export default function Dashboard() {
       </div>
 
       {/* Repositories Section */}
-      <div className='w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-5 mt-10'>
+      <div className='w-full md:max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-5 mt-10'>
         {repos.slice(0, visibleRepos).map((repo, index) => (
           <div
             key={index}
@@ -212,9 +213,9 @@ export default function Dashboard() {
       </div>
 
       {visibleRepos < repos.length && (
-        <div className='flex justify-center items-center w-full h-auto'>
-          <button onClick={handleShowMore} className='mt-6 bg-gray-300 rounded-[24px] hover:bg-gray-400 text-[16px] hover:duration-500 text-gray-900 px-4 py-2'>
-            Show More
+        <div className='flex justify-center items-center mt-20 w-full h-auto'>
+          <button onClick={handleShowMore} className='bg-transparent rounded-[24px] border border-gray-100 hover:bg-black flex gap-1 text-gray-200 text-[14px] hover:duration-500 px-4 py-2'>
+            Show More <IoIosArrowDown size={25} />
           </button>
         </div>
       )}
