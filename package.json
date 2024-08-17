@@ -19,7 +19,9 @@
     "react": "^18",
     "react-activity-calendar": "^2.3.5",
     "react-dom": "^18",
+    "react-icons": "^5.3.0",
     "react-tooltip": "^5.28.0",
+    "simple-icons": "^13.5.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7"
   },

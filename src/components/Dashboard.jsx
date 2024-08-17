@@ -1,18 +1,46 @@
 'use client'
 
 import { useState, useRef } from 'react';
+import { SiJavascript, SiTypescript, SiHtml5, SiCss3, SiPython, SiC, SiCplusplus } from 'react-icons/si';
+import { ChevronRight } from "lucide-react";
 import HeatMap from '@uiw/react-heat-map';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react";
+import { LuExternalLink } from "react-icons/lu";
+import { GoStar } from "react-icons/go";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
+
+  const languageIcons = {
+    javascript: <SiJavascript size={15} />,
+    typescript: <SiTypescript size={15} />,
+    html: <SiHtml5 size={15} />,
+    css: <SiCss3 size={15} />,
+    python: <SiPython size={15} />,
+    c: <SiC size={15} />,
+    cplusplus: <SiCplusplus size={15} />,
+  };
+
+  const router = useRouter();
+
   const [username, setUsername] = useState('');
   const [contributions, setContributions] = useState([]);
+  const [repos, setRepos] = useState([]);
   const [c, setC] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [tooltip, setTooltip] = useState({ visible: false, content: '', x: 0, y: 0 });
+  const [visibleRepos, setVisibleRepos] = useState(6); // Initially show 6 repos
 
   const heatMapContainerRef = useRef(null);
 
@@ -20,8 +48,11 @@ export default function Dashboard() {
     setLoading(true);
     try {
       const res = await fetch(`/api/github?username=${username}`);
+      const res2 = await fetch(`/api/github/repositories?username=${username}`);
+      const data2 = await res2.json();
       const data = await res.json();
-      console.log('Fetched Data:', data);
+      console.log('Contribution Data:', data);
+      console.log('Repositories Data:', data2);
 
       const extractedData = data.weeks.flatMap(week =>
         week.contributionDays.map(day => ({
@@ -30,8 +61,9 @@ export default function Dashboard() {
         }))
       );
 
-      if (res.ok) {
+      if (res.ok && res2.ok) {
         setContributions(extractedData);
+        setRepos(data2);
         setC(data);
         setError('');
       } else {
@@ -68,6 +100,10 @@ export default function Dashboard() {
 
   const handleMouseLeave = () => {
     setTooltip({ ...tooltip, visible: false });
+  };
+
+  const handleShowMore = () => {
+    setVisibleRepos((prevVisibleRepos) => prevVisibleRepos + 6);
   };
 
   return (
@@ -139,6 +175,49 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
+      {/* Repositories Section */}
+      <div className='w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-5 mt-10'>
+        {repos.slice(0, visibleRepos).map((repo, index) => (
+          <div
+            key={index}
+            className='bg-transparent flex flex-col hover:shadow-xl duration-300 justify-center items-center border rounded-[20px] w-[320px] h-[150px] px-2 py-1'
+            style={{ borderColor: `${repo?.languages?.nodes[0]?.color}` }}
+          >
+            <p className='text-[14px] text-gray-200'>{username}/</p>
+            <span className="text-[14px] text-gray-200 font-bold">{repo.name}</span>
+
+            <div className='flex justify-between items-center w-full px-4 mt-12'>
+              <div className='flex gap-3'>
+                <div
+                  style={{ color: `${repo?.languages?.nodes[0]?.color}` }}
+                >
+                  {languageIcons[repo?.languages?.nodes[0]?.name.toLowerCase()] || 
+                    <span className='text-[12px] text-gray-400 font-semibold'>
+                      {repo?.languages?.nodes[0]?.name}
+                    </span>}
+                </div>
+                <p style={{ color: `${repo?.languages?.nodes[0]?.color}` }} className='text-[12px] text-gray-400 font-semibold'>
+                  {repo?.languages?.nodes[0]?.name}
+                </p>
+                <div className='flex gap-1'>
+                  <GoStar size={15} className='text-gray-400 hover:text-gray-200 duration-500 cursor-pointer' onClick={() => window.open(repo.url, '_blank', 'noopener,noreferrer')} />
+                  <p className='text-[12px] text-gray-400'>{repo.stargazerCount}</p>
+                </div>
+              </div>
+              <LuExternalLink size={20} className='text-gray-200 cursor-pointer' onClick={() => window.open(repo.url, '_blank', 'noopener,noreferrer')} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {visibleRepos < repos.length && (
+        <div className='flex justify-center items-center w-full h-auto'>
+          <button onClick={handleShowMore} className='mt-6 bg-gray-300 rounded-[24px] hover:bg-gray-400 text-[16px] hover:duration-500 text-gray-900 px-4 py-2'>
+            Show More
+          </button>
+        </div>
+      )}
     </div>
   );
 }
