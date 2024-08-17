@@ -9,13 +9,19 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.1.0",
     "@uiw/react-heat-map": "^2.2.2",
     "@uiw/react-tooltip": "^4.22.3",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.428.0",
     "next": "14.2.5",
     "react": "^18",
     "react-activity-calendar": "^2.3.5",
     "react-dom": "^18",
-    "react-tooltip": "^5.28.0"
+    "react-tooltip": "^5.28.0",
+    "tailwind-merge": "^2.5.2",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "eslint": "^8",

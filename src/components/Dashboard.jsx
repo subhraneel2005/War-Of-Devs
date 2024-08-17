@@ -2,18 +2,22 @@
 
 import { useState, useRef } from 'react';
 import HeatMap from '@uiw/react-heat-map';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
+import { Loader2 } from "lucide-react"
 
 export default function Dashboard() {
   const [username, setUsername] = useState('');
   const [contributions, setContributions] = useState([]);
   const [c, setC] = useState([]);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [tooltip, setTooltip] = useState({ visible: false, content: '', x: 0, y: 0 });
 
-  // Reference to the HeatMap container
   const heatMapContainerRef = useRef(null);
 
   const fetchContributions = async () => {
+    setLoading(true);
     try {
       const res = await fetch(`/api/github?username=${username}`);
       const data = await res.json();
@@ -25,6 +29,7 @@ export default function Dashboard() {
           count: day.contributionCount
         }))
       );
+
       if (res.ok) {
         setContributions(extractedData);
         setC(data);
@@ -34,21 +39,20 @@ export default function Dashboard() {
       }
     } catch (err) {
       setError('An unexpected error occurred');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Find the earliest date in processedData
   const earliestDate = contributions.length > 0
     ? new Date(Math.min(...contributions.map(c => new Date(c.date).getTime())))
     : new Date();
 
-  // Create a map for quick access to contribution counts
   const contributionMap = contributions.reduce((map, entry) => {
     map[entry.date] = entry.count;
     return map;
   }, {});
 
-  // Handle mouse enter event for showing tooltip
   const handleMouseEnter = (event, date) => {
     const contributionCount = contributionMap[date] || 0;
     const rect = event.target.getBoundingClientRect();
@@ -56,29 +60,35 @@ export default function Dashboard() {
 
     setTooltip({
       visible: true,
-      content: `Contributions: ${contributionCount}`,
+      content: `${contributionCount === 0 ? 'No Contributions' : `${contributionCount} Contributions`}`,
       x: rect.left - containerRect.left + window.scrollX + rect.width / 2,
-      y: rect.top - containerRect.top + window.scrollY - 40 // Adjust vertical position
+      y: rect.top - containerRect.top + window.scrollY - 40
     });
   };
 
-  // Handle mouse leave event for hiding tooltip
   const handleMouseLeave = () => {
     setTooltip({ ...tooltip, visible: false });
   };
 
   return (
-    <div className='min-h-screen w-full bg-slate-900 flex flex-col items-center p-4'>
-      <input
-        type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="GitHub username"
-        className='text-black p-2 mb-4'
-      />
-      <button onClick={fetchContributions} className='mb-4 p-2 bg-blue-500 text-white'>
-        Get Contributions
-      </button>
+    <div className='min-h-screen w-full flex flex-col items-center p-4'>
+      <div className='flex justify-center items-center gap-4 py-8'>
+        <Input
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="GitHub username"
+        />
+        <Button onClick={fetchContributions} disabled={loading}>
+          {loading ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="animate-spin" />
+              Please wait...
+            </div>
+          ) : (
+            "Get Contributions"
+          )}
+        </Button>
+      </div>
 
       {error && <p className='text-red-500'>{error}</p>}
       {c.totalContributions && <p>{c.totalContributions} contributions till now</p>}
@@ -100,6 +110,14 @@ export default function Dashboard() {
               onMouseLeave={handleMouseLeave}
             />
           )}
+          panelColors={{
+            0: '#dad7cd',
+            2: '#a3b18a',
+            4: '#588157',
+            10: '#3a5a40',
+            20: '#344e41',
+            30: '#283618',
+          }}
         />
         {tooltip.visible && (
           <div
