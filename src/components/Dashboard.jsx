@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import HeatMap from '@uiw/react-heat-map';
 
 export default function Dashboard() {
@@ -9,6 +9,9 @@ export default function Dashboard() {
   const [c, setC] = useState([]);
   const [error, setError] = useState('');
   const [tooltip, setTooltip] = useState({ visible: false, content: '', x: 0, y: 0 });
+
+  // Reference to the HeatMap container
+  const heatMapContainerRef = useRef(null);
 
   const fetchContributions = async () => {
     try {
@@ -49,13 +52,13 @@ export default function Dashboard() {
   const handleMouseEnter = (event, date) => {
     const contributionCount = contributionMap[date] || 0;
     const rect = event.target.getBoundingClientRect();
-    const containerRect = event.currentTarget.getBoundingClientRect();
+    const containerRect = heatMapContainerRef.current.getBoundingClientRect();
 
     setTooltip({
       visible: true,
-      content: `Count: ${contributionCount}`,
+      content: `Contributions: ${contributionCount}`,
       x: rect.left - containerRect.left + window.scrollX + rect.width / 2,
-      y: rect.top - containerRect.top + window.scrollY - 30 // Adjust vertical position
+      y: rect.top - containerRect.top + window.scrollY - 40 // Adjust vertical position
     });
   };
 
@@ -80,7 +83,7 @@ export default function Dashboard() {
       {error && <p className='text-red-500'>{error}</p>}
       {c.totalContributions && <p>{c.totalContributions} contributions till now</p>}
 
-      <div className='relative w-full max-w-2xl'>
+      <div className='relative w-full max-w-2xl' ref={heatMapContainerRef}>
         <HeatMap
           value={contributions}
           width={600}
@@ -100,7 +103,7 @@ export default function Dashboard() {
         />
         {tooltip.visible && (
           <div
-            className='absolute bg-black text-white text-xs p-1 rounded shadow-md'
+            className='absolute bg-slate-950 text-white text-xs p-1 rounded shadow-md'
             style={{
               left: tooltip.x,
               top: tooltip.y,
@@ -109,7 +112,7 @@ export default function Dashboard() {
             }}
           >
             {tooltip.content}
-            <div className='absolute w-0 h-0 border-l-4 border-l-black border-r-4 border-r-transparent border-t-4 border-t-transparent border-b-4 border-b-black' style={{
+            <div className='absolute' style={{
               left: '50%',
               top: '100%',
               transform: 'translateX(-50%)',
