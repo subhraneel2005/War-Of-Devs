@@ -78,8 +78,21 @@ export default function Dashboard() {
   };
 
   const earliestDate = contributions.length > 0
-    ? new Date(Math.min(...contributions.map(c => new Date(c.date).getTime())))
+  ? new Date(new Date().getFullYear(), 0, 1)  // January 1st of the current year
+  : new Date(new Date().getFullYear(), 0, 1);
+
+
+  const lastDate = contributions.length > 0
+    ? new Date(Math.max(...contributions.map(c => new Date(c.date).getTime())))
     : new Date();
+  
+  // Adjust lastDate to be today's date if it's earlier than today
+  const today = new Date();
+  if (lastDate < today) {
+    lastDate.setFullYear(today.getFullYear(), today.getMonth(), today.getDate());
+  }
+  
+  
 
   const contributionMap = contributions.reduce((map, entry) => {
     map[entry.date] = entry.count;
@@ -130,11 +143,12 @@ export default function Dashboard() {
       {error && <p className='text-red-500'>{error}</p>}
       {c.totalContributions && <p>{c.totalContributions} contributions till now</p>}
 
-      <div className='relative w-full md:max-w-2xl overflow-hidden' ref={heatMapContainerRef}>
+      <div className='relative w-full md:max-w-2xl' ref={heatMapContainerRef}>
         <HeatMap
           value={contributions}
-          width={600}
+          width={700}
           startDate={earliestDate}
+          // endDate={lastDate}
           style={{ '--rhm-rect': '#b9b9b9', color: '#fff' }}
           legendRender={(props) => <rect {...props} y={props.y + 10} rx={3} />}
           rectProps={{
@@ -148,13 +162,14 @@ export default function Dashboard() {
             />
           )}
           panelColors={{
-            0: '#dad7cd',
-            2: '#a3b18a',
-            4: '#588157',
-            10: '#3a5a40',
-            20: '#344e41',
-            30: '#283618',
+            0: '#fff4e6',
+            2: '#fff4e6',     
+            4: '#e76f51',     
+            10: '#d65a31',    
+            20: '#bc4b25',    
+            30: '#8c3b1f',
           }}
+          
         />
         {tooltip.visible && (
           <div
