@@ -1,9 +1,25 @@
+'use client'
+
 import React from 'react'
 import { Button } from './ui/button'
+import { useRouter } from 'next/navigation'
+import {getSession, useSession, signIn, signOut} from 'next-auth/react'
+import { useEffect } from 'react'
 
 function Homepage() {
+
+  const router = useRouter();
+  const session = useSession();
+
+  const user = session?.data?.user;
+
+  const logOut = () => {
+    signOut();
+  }
+
+
   return (
-    <div className='bg-slate-900'>
+    <div className='bg-zinc-900'>
       {/* Navbar */}
       <nav className='flex justify-between items-center px-16 py-6'>
         <div className='flex items-center gap-2'>
@@ -12,7 +28,7 @@ function Homepage() {
           <a href="#" className='text-gray-300 text-[16px] ml-6 md:ml-16'>Pricing</a>
           <a href="#" className='text-gray-300 text-[16px] ml-4'>Leaderboard</a>
         </div>
-          <button className="btn btn-neutral btn-sm rounded-xl font-bold">Sign in</button>
+          {user? <button className="btn btn-neutral btn-sm rounded-xl font-bold" onClick={logOut}>Sign out</button> : <button className="btn btn-neutral btn-sm rounded-xl font-bold" onClick={() => router.push('/api/auth/signin')}>Sign in</button>}
       </nav>
       
       {/* Main Content */}
@@ -23,7 +39,7 @@ function Homepage() {
           <h1 className='text-4xl'>Showcase your <span className='text-orange-500 text-6xl'>hardwork</span></h1>
           <div className='py-12 flex gap-6'>
             <button className='btn btn-neutral rounded-xl font-bold'>Leaderboard 🏆</button>
-            <button className='btn bg-orange-400 hover:bg-orange-500 duration-500 text-orange-950 font-bold rounded-xl btn-active'>Get Started</button>
+            <button className='btn bg-orange-400 hover:bg-orange-500 duration-500 text-orange-950 font-bold rounded-xl btn-active' onClick={() => router.push('/dashboard')}>Get Started</button>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import "./globals.css";
+import SessionProviderWrapper from "@/providers/SessionProviderWrapper";
 
 export const metadata = {
   title: "War Of Devs",
@@ -8,7 +9,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className='dark'>
-      <body>{children}</body>
+      <body>
+        <SessionProviderWrapper>
+          {children}
+        </SessionProviderWrapper>
+        </body>
     </html>
   );
 }
