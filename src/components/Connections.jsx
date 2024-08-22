@@ -50,6 +50,8 @@ function Connections() {
                 <input type="text" placeholder="Where do you live?" className="input input-bordered w-full input-sm max-w-xs" />
                 <input type="text" placeholder="Your Resume link (optional)" className="input input-bordered w-full input-sm max-w-xs" />
                 <textarea className="textarea textarea-bordered w-full max-w-xs" placeholder="Bio"></textarea>
+
+                <button className="btn rounded-xl bg-green-900 hover:bg-green-950 text-green-300">Submit</button>
             </div>
 
             <div className="flex flex-col justify-center items-center py-6 px-12 space-y-6">
