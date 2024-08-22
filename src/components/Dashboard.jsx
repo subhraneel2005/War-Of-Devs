@@ -10,6 +10,9 @@ import { Loader2 } from "lucide-react";
 import { LuExternalLink } from "react-icons/lu";
 import { GoStar } from "react-icons/go";
 import { IoIosArrowDown } from "react-icons/io";
+import { FaLocationDot } from "react-icons/fa6";
+import { FaGithub } from "react-icons/fa";
+import { BiSolidUpArrow } from "react-icons/bi";
 import {
   Card,
   CardContent,
@@ -19,6 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export default function Dashboard() {
 
@@ -33,6 +37,9 @@ export default function Dashboard() {
   };
 
   const router = useRouter();
+  const session = useSession();
+
+  const user = session?.data?.user;
 
   const [username, setUsername] = useState('');
   const [contributions, setContributions] = useState([]);
@@ -120,8 +127,43 @@ export default function Dashboard() {
     setVisibleRepos((prevVisibleRepos) => prevVisibleRepos + 6);
   };
 
+  if(!user){
+    router.push('/api/auth/signin')
+  }
+
   return (
-    <div className='min-h-screen w-full flex flex-col items-center p-4'>
+    <div className='min-h-screen w-full flex items-center p-4 bg-zinc-900'>
+
+    <div className='w-[20%] flex flex-col items-center fixed top-10 pl-10'>
+    {user?.image && <div className="avatar">
+      <div className="w-24 md:w-40 rounded-full">
+        <img src={user?.image} />
+      </div>
+    </div>}
+    
+    <h1 className='text-[2rem] text-zinc-300 mt-5 font-bold text-center'>{user?.name}</h1>
+    
+    <div className='flex justify-between w-full gap-12 mt-10'>
+      <div className='flex gap-1'>
+        <FaLocationDot className='text-gray-400' size={20} />
+        <p className='text-gray-400 text-[12px]'>India</p>
+      </div>
+      <div className='flex gap-1'>
+        <FaGithub className='text-gray-400' size={20} />
+        <p className='text-gray-400 text-[12px]'>{c?.totalContributions} contributions</p>
+      </div>
+    </div>
+
+    <div className='flex gap-1 mt-12 justify-center items-center'>
+      <BiSolidUpArrow size={30} className='text-orange-600 flex justify-center items-center' />
+      <p className='text-gray-400 text-[17px] text-center'>170 Upvotes</p>
+    </div>
+
+    </div>
+
+    <div className='w-[80%] flex flex-col items-center overflow-y-auto ml-[20%]'>
+
+    
       <div className='flex justify-center items-center gap-4 py-8'>
         <Input
           value={username}
@@ -143,7 +185,7 @@ export default function Dashboard() {
       {error && <p className='text-red-500'>{error}</p>}
       {c.totalContributions && <p>{c.totalContributions} contributions till now</p>}
 
-      <div className='relative w-full md:max-w-2xl' ref={heatMapContainerRef}>
+      {username && <div className='relative w-full md:max-w-2xl' ref={heatMapContainerRef}>
         <HeatMap
           value={contributions}
           width={700}
@@ -190,7 +232,7 @@ export default function Dashboard() {
             }} />
           </div>
         )}
-      </div>
+      </div>}
 
       {/* Repositories Section */}
       <div className='w-full md:max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-5 mt-10'>
@@ -234,6 +276,8 @@ export default function Dashboard() {
           </button>
         </div>
       )}
+    </div>
+
     </div>
   );
 }
