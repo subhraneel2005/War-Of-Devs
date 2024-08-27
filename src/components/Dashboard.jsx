@@ -86,8 +86,6 @@ export default function Dashboard() {
       const res2 = await fetch(`/api/github/repositories?username=${userDetails?.githubId}`);
       const data2 = await res2.json();
       const data = await res.json();
-      console.log('Contribution Data:', data);
-      console.log('Repositories Data:', data2);
 
       const extractedData = data.weeks.flatMap(week =>
         week.contributionDays.map(day => ({
