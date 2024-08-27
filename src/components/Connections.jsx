@@ -33,6 +33,8 @@ function Connections() {
 
    
     const submitProfile = async () => {
+
+        
         try {
             const userData = {
                 name,
@@ -54,6 +56,7 @@ function Connections() {
 
             if (res.msg) {
                 alert('Profile added to database successfully');
+                console.log(res);
             } else {
                 alert('Error: ' + res.errMsg);
             }
