@@ -4,6 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'PixelFont';
+  src: url('/fonts/Pixel.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 @layer base {
   :root {
@@ -69,8 +75,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 600;
+    /* font-family: 'Open Sans', sans-serif;
+    font-weight: 600; */
+    font-family: 'PixelFont', sans-serif;
   }
 }
 
