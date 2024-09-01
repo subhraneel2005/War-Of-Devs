@@ -77,6 +77,8 @@ export default function Dashboard() {
     const [isUserExists, setIsUserExists] = useState(false);
     const [userDetails, setUserDetails] = useState(null);
 
+    const hasFetchedContributions = useRef(false);
+
   const heatMapContainerRef = useRef(null);
 
   const fetchContributions = async () => {
@@ -165,11 +167,15 @@ export default function Dashboard() {
       }
     };
     checkUserExists();
-    
-    if(userDetails){
+  }, [user?.email]);
+
+  useEffect(() => {
+    if (userDetails && !hasFetchedContributions.current) {
       fetchContributions();
+      hasFetchedContributions.current = true;
     }
-  }, [user?.email , userDetails]);
+  }, [userDetails]);
+
 
 
   const submitProfile = async () => {
@@ -214,7 +220,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className='min-h-screen w-full flex items-center p-4 bg-zinc-900'>
+    <div className='min-h-screen w-full flex items-center p-4'>
 
     <div className='w-[20%] flex flex-col items-center fixed top-10 pl-10'>
     {user?.image && <div className="avatar">
@@ -223,23 +229,24 @@ export default function Dashboard() {
       </div>
     </div>}
     
-    <h1 className='text-[2rem] text-zinc-300 mt-5 font-bold text-center'>{userDetails?.name}</h1>
+    <h1 className='text-[2rem] mt-5 font-bold text-center'>{userDetails?.name}</h1>
     
     <div className='flex justify-between w-full gap-12 mt-10'>
       <div className='flex gap-1'>
-        <FaLocationDot className='text-gray-400' size={20} />
-        <p className='text-gray-400 text-[12px]'>{userDetails?.location}</p>
+        <FaLocationDot className='' size={20} />
+        <p className='text-[12px]'>{userDetails?.location}</p>
       </div>
       <div className='flex gap-1'>
-        <FaGithub className='text-gray-400' size={20} />
-        <p className='text-gray-400 text-[12px]'>{c?.totalContributions} contributions</p>
+        <FaGithub className='' size={20} />
+        <p className='text-[12px]'>{c?.totalContributions}</p>
       </div>
     </div>
+    <p className=' text-[14px] mt-14'>{userDetails?.bio}</p>
 
-    <div className='flex gap-1 mt-12 justify-center items-center'>
+    {/* <div className='flex gap-1 mt-12 justify-center items-center'>
       <BiSolidUpArrow size={30} className='text-orange-600 flex justify-center items-center' />
       <p className='text-gray-400 text-[17px] text-center'>{userDetails?.profileUpvotes}</p>
-    </div>
+    </div> */}
 
     </div>
 
@@ -248,7 +255,7 @@ export default function Dashboard() {
     <div className='w-[80%] flex flex-col items-center overflow-y-auto ml-[20%]'>
 
     {error && <p className='text-red-500'>{error}</p>}
-    {c.totalContributions && <p>{c.totalContributions} contributions till now</p>}
+    {c.totalContributions ? <p>{c.totalContributions} contributions till now</p> : <p>Loading your contributions...</p>}
     
     {userDetails?.githubId && <div className='relative w-full md:max-w-2xl' ref={heatMapContainerRef}>
       <HeatMap
@@ -269,12 +276,12 @@ export default function Dashboard() {
           />
         )}
         panelColors={{
-          0: '#fff4e6',
-          2: '#fff4e6',     
-          4: '#e76f51',     
-          10: '#d65a31',    
-          20: '#bc4b25',    
-          30: '#8c3b1f',
+          0: '#e0f7fa',
+          2: '#b2ebf2',
+          4: '#81d4fa',
+          10: '#4fc3f7',
+          20: '#29b6f6',
+          30: '#0288d1'          
         }}
         
       />
@@ -304,11 +311,10 @@ export default function Dashboard() {
       {repos.slice(0, visibleRepos).map((repo, index) => (
         <div
           key={index}
-          className='bg-transparent flex flex-col hover:shadow-xl duration-300 justify-center items-center border rounded-[20px] w-[320px] h-[150px] px-2 py-1'
-          style={{ borderColor: `${repo?.languages?.nodes[0]?.color}` }}
+          className='bg-transparent flex flex-col cursor-pointer hover:shadow-xl duration-300 justify-center items-center border border-gray-100 rounded-[20px] w-[320px] h-[150px] px-2 py-1'
         >
-          <p className='text-[14px] text-gray-200'>{userDetails?.githubId}/</p>
-          <span className="text-[14px] text-gray-200 font-bold">{repo.name}</span>
+          <p className='text-[14px]'>{userDetails?.githubId}/</p>
+          <span className="text-[14px] font-bold">{repo.name}</span>
     
           <div className='flex justify-between items-center w-full px-4 mt-12'>
             <div className='flex gap-3'>
@@ -316,19 +322,19 @@ export default function Dashboard() {
                 style={{ color: `${repo?.languages?.nodes[0]?.color}` }}
               >
                 {languageIcons[repo?.languages?.nodes[0]?.name.toLowerCase()] || 
-                  <span className='text-[12px] text-gray-400 font-semibold'>
+                  <span className='text-[12px] font-semibold'>
                     {repo?.languages?.nodes[0]?.name}
                   </span>}
               </div>
-              <p style={{ color: `${repo?.languages?.nodes[0]?.color}` }} className='text-[12px] text-gray-400 font-semibold'>
+              <p style={{ color: `${repo?.languages?.nodes[0]?.color}` }} className='text-[12px] font-semibold'>
                 {repo?.languages?.nodes[0]?.name}
               </p>
               <div className='flex gap-1'>
-                <GoStar size={15} className='text-gray-400 hover:text-gray-200 duration-500 cursor-pointer' onClick={() => window.open(repo.url, '_blank', 'noopener,noreferrer')} />
-                <p className='text-[12px] text-gray-400'>{repo.stargazerCount}</p>
+                <GoStar size={15} className='cursor-pointer' onClick={() => window.open(repo.url, '_blank', 'noopener,noreferrer')} />
+                <p className='text-[12px]'>{repo.stargazerCount}</p>
               </div>
             </div>
-            <LuExternalLink size={20} className='text-gray-200 cursor-pointer' onClick={() => window.open(repo.url, '_blank', 'noopener,noreferrer')} />
+            <LuExternalLink size={20} className='cursor-pointer' onClick={() => window.open(repo.url, '_blank', 'noopener,noreferrer')} />
           </div>
         </div>
       ))}
@@ -336,7 +342,7 @@ export default function Dashboard() {
     
     {visibleRepos < repos.length && (
       <div className='flex justify-center items-center mt-20 w-full h-auto'>
-        <button onClick={handleShowMore} className='bg-transparent rounded-[24px] border border-gray-100 hover:bg-black flex gap-1 text-gray-200 text-[14px] hover:duration-500 px-4 py-2'>
+        <button onClick={handleShowMore} className='bg-transparent rounded-[24px] border border-gray-100 hover:bg-sky-700 flex gap-1 text-[14px] hover:duration-500 px-4 py-2'>
           Show More <IoIosArrowDown size={25} />
         </button>
       </div>
@@ -345,7 +351,7 @@ export default function Dashboard() {
     <div className='w-[80%] flex flex-col items-center overflow-y-auto ml-[20%]'>
 
 <div className="flex flex-col justify-center items-center py-6 px-12 space-y-6">
-    <h2 className='text-[24px] font-bold text-gray-100 text-center mb-8'>Share your details 😏</h2>
+    <h2 className='text-[24px] font-bold text-center mb-8'>Share your details 😏</h2>
 
     <input type="text" placeholder="Your Name" className="input input-bordered w-full input-sm max-w-xs" onChange={(e) => setName(e.target.value)} value={name}/>
     <input type="text" placeholder="Where do you live?" className="input input-bordered w-full input-sm max-w-xs" onChange={(e) => setLocation(e.target.value)} value={location}/>
@@ -356,7 +362,7 @@ export default function Dashboard() {
 </div>
 
 <div className="flex flex-col justify-center items-center py-6 px-12 space-y-6">
-    <p className='text-zinc-300 text-center pt-6'>Add Connections</p>
+    <p className=' text-center pt-6'>Add Connections</p>
 
     <div className='grid grid-cols-2 w-full gap-6'>
         <Dialog>

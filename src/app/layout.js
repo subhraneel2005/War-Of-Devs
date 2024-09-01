@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className='dark tracking-wider'>
+    <html lang="en" data-theme='sunset'>
       <body>
         <SessionProviderWrapper>
           {children}
