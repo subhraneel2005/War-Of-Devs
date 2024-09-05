@@ -1,45 +1,30 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react';
-import { SiJavascript, SiTypescript, SiHtml5, SiCss3, SiPython, SiC, SiCplusplus } from 'react-icons/si';
-import { ChevronRight } from "lucide-react";
+import {SiSolidity, SiShell, SiJavascript, SiTypescript, SiHtml5, SiCss3, SiPython, SiC, SiCplusplus } from 'react-icons/si';
 import HeatMap from '@uiw/react-heat-map';
-import { Button } from './ui/button';
-import { Loader2 } from "lucide-react";
 import { LuExternalLink } from "react-icons/lu";
 import { GoStar } from "react-icons/go";
 import { IoIosArrowDown } from "react-icons/io";
 import { FaLocationDot } from "react-icons/fa6";
 import { FaGithub } from "react-icons/fa";
-import { BiSolidUpArrow } from "react-icons/bi";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { useRouter } from 'next/navigation';
 import { IoLogoGithub } from "react-icons/io";
 import { FaLinkedin, FaInstagram, FaProductHunt } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { IoLogoYoutube } from "react-icons/io5";
-import {
-    Dialog,
-    DialogContent,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from './ui/input';
-import axios from 'axios';
 import { postNewUser, getUserByEmail } from '@/actions/userAction';
 import { useSession } from 'next-auth/react';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+  
 export default function Dashboard() {
 
   const languageIcons = {
     javascript: <SiJavascript size={15} />,
     typescript: <SiTypescript size={15} />,
+    solidity: <SiSolidity size={15} />,
+    shell: <SiShell size={15} />,
     html: <SiHtml5 size={15} />,
     css: <SiCss3 size={15} />,
     python: <SiPython size={15} />,
@@ -204,9 +189,9 @@ export default function Dashboard() {
         const res = await postNewUser(userData)
 
         if (res.msg) {
-            alert('Profile added to database successfully');
+            toast('Profile added to database successfully');
         } else {
-            alert('Error: ' + res.errMsg);
+            toast('Error: ' + res.errMsg);
         }
         
 
@@ -221,27 +206,36 @@ export default function Dashboard() {
 
   return (
     <div className='min-h-screen w-full flex items-center p-4'>
-
-    <div className='w-[20%] flex flex-col items-center fixed top-10 pl-10'>
+    <ToastContainer/>
+    <div className='w-[25%] h-full flex flex-col items-center py-4 fixed top-0 border-r border-b-gray-400'>
     {user?.image && <div className="avatar">
       <div className="w-24 md:w-40 rounded-full">
         <img src={user?.image} />
       </div>
     </div>}
     
-    <h1 className='text-[2rem] mt-5 font-bold text-center'>{userDetails?.name}</h1>
+    <h1 className='text-[2rem] mt-5 font-bold text-center'>{userDetails?.name?.split(' ')[0]}</h1>
     
-    <div className='flex justify-between w-full gap-12 mt-10'>
+    <div className='flex justify-evenly items-center w-[70%] mt-6'>
+      {userDetails?.twitterId && <FaXTwitter className='cursor-pointer' size={20} onClick={() => window.open(userDetails?.twitterId, '_blank', 'noopener,noreferrer')} />}
+      {userDetails?.linkedinId && <FaLinkedin className='text-blue-500 cursor-pointer' size={20} onClick={() => window.open(userDetails?.linkedinId, '_blank', 'noopener,noreferrer')} />}
+      {userDetails?.instagramId && <FaInstagram className='text-pink-500 cursor-pointer' size={20} onClick={() => window.open(userDetails?.instagramId, '_blank', 'noopener,noreferrer')} />}
+    </div>
+
+    <div className='flex justify-evenly w-full gap-12 mt-10'>
       <div className='flex gap-1'>
         <FaLocationDot className='' size={20} />
         <p className='text-[12px]'>{userDetails?.location}</p>
+      </div>
+      <div>
+        <p className='text-[12px] text-yellow-500'>{userDetails?.profileUpvotes} votes</p>
       </div>
       <div className='flex gap-1'>
         <FaGithub className='' size={20} />
         <p className='text-[12px]'>{c?.totalContributions}</p>
       </div>
     </div>
-    <p className=' text-[14px] mt-14'>{userDetails?.bio}</p>
+    <p className=' text-[13px] mt-7 text-gray-400 px-5'>{userDetails?.bio}</p>
 
     {/* <div className='flex gap-1 mt-12 justify-center items-center'>
       <BiSolidUpArrow size={30} className='text-orange-600 flex justify-center items-center' />
@@ -252,7 +246,7 @@ export default function Dashboard() {
 
     {/* Add Details Section */}
     {isUserExists ? 
-    <div className='w-[80%] flex flex-col items-center overflow-y-auto ml-[20%]'>
+    <div className='w-[80%] flex flex-col items-center overflow-y-auto ml-[25%]'>
 
     {error && <p className='text-red-500'>{error}</p>}
     {c.totalContributions ? <p>{c.totalContributions} contributions till now</p> : <p>Loading your contributions...</p>}
@@ -348,9 +342,9 @@ export default function Dashboard() {
       </div>
     )}
     </div> :
-    <div className='w-[80%] flex flex-col items-center overflow-y-auto ml-[20%]'>
+    <div className='w-[80%] flex flex-col items-center overflow-y-auto ml-[25%]'>
 
-<div className="flex flex-col justify-center items-center py-6 px-12 space-y-6">
+  <div className="flex flex-col justify-center items-center py-6 px-12 space-y-6">
     <h2 className='text-[24px] font-bold text-center mb-8'>Share your details 😏</h2>
 
     <input type="text" placeholder="Your Name" className="input input-bordered w-full input-sm max-w-xs" onChange={(e) => setName(e.target.value)} value={name}/>
@@ -359,96 +353,79 @@ export default function Dashboard() {
     <textarea className="textarea textarea-bordered w-full max-w-xs" placeholder="Bio" onChange={(e) => setBio(e.target.value)} value={bio} />
 
     <button onClick={submitProfile} className="btn rounded-xl bg-green-900 hover:bg-green-950 text-green-300">Submit</button>
-</div>
+  </div>
 
-<div className="flex flex-col justify-center items-center py-6 px-12 space-y-6">
+    <div className="flex flex-col justify-center items-center py-6 px-12 space-y-6">
     <p className=' text-center pt-6'>Add Connections</p>
 
     <div className='grid grid-cols-2 w-full gap-6'>
-        <Dialog>
-            <DialogTrigger>
-                <div className='px-4 py-2 rounded-lg gap-2 cursor-pointer border bg-zinc-700 hover:bg-zinc-800 duration-500 border-gray-300 flex justify-center items-center'>Github <IoLogoGithub size={15} /></div>
-            </DialogTrigger>
-            <DialogContent>
-                <div className='space-y-6 p-5'>
-                    <Input placeholder='Your Github Username' onChange={(e) => setGithubId(e.target.value)} value={githubId}/>
-                    <div className='flex justify-center items-center'>
-                        <button className="btn btn-sm">Connect</button> 
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
-
-        <Dialog>
-            <DialogTrigger>
-                <div className='px-4 py-2 rounded-lg gap-2 cursor-pointer border bg-sky-700 hover:bg-sky-800 duration-500 border-gray-300 flex justify-center items-center'>LinkedIn <FaLinkedin size={15} /></div>
-            </DialogTrigger>
-            <DialogContent>
-                <div className='space-y-6 p-5'>
-                    <Input placeholder='Your LinkedIn Username' onChange={(e) => setLinkedinId(e.target.value)} value={linkedinId}/>
-                    <div className='flex justify-center items-center'>
-                        <button className="btn btn-sm">Connect</button> 
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
-
-        <Dialog>
-            <DialogTrigger>
-                <div className='px-4 py-2 rounded-lg gap-2 cursor-pointer border bg-black border-gray-300 flex justify-center items-center'>Twitter <FaXTwitter size={15} /></div>
-            </DialogTrigger>
-            <DialogContent>
-                <div className='space-y-6 p-5'>
-                    <Input placeholder='Your Twitter Username' onChange={(e) => setTwitterId(e.target.value)} value={twitterId}/>
-                    <div className='flex justify-center items-center'>
-                        <button className="btn btn-sm">Connect</button> 
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
-
-        <Dialog>
-            <DialogTrigger>
-            <div className='px-4 py-2 rounded-lg gap-2 cursor-pointer border border-gray-300 flex justify-center items-center bg-pink-700 hover:bg-pink-800 duration-500'>Instagram<FaInstagram size={15} /></div>
-            </DialogTrigger>
-            <DialogContent>
-                <div className='space-y-6 p-5'>
-                    <Input placeholder='Your Instagram Username' onChange={(e) => setInstagramId(e.target.value)} value={instagramId}/>
-                    <div className='flex justify-center items-center'>
-                        <button className="btn btn-sm">Connect</button> 
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
-
-        <Dialog>
-            <DialogTrigger>
-            <div className='px-4 py-2 rounded-lg gap-2 cursor-pointer border border-gray-300 flex justify-center items-center bg-red-700 hover:bg-red-800 duration-500'>Youtube<IoLogoYoutube size={15} /></div>
-            </DialogTrigger>
-            <DialogContent>
-                <div className='space-y-6 p-5'>
-                    <Input placeholder='Your Youtube Channel link' onChange={(e) => setYoutubeId(e.target.value)} value={youtubeId}/>
-                    <div className='flex justify-center items-center'>
-                        <button className="btn btn-sm">Connect</button> 
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
-
-        <Dialog>
-            <DialogTrigger>
-            <div className='px-4 py-2 rounded-lg gap-2 cursor-pointer border border-gray-300 flex justify-center items-center bg-orange-700 hover:bg-orange-800 duration-500'>ProductHunt<FaProductHunt size={15} /></div>
-            </DialogTrigger>
-            <DialogContent>
-                <div className='space-y-6 p-5'>
-                    <Input placeholder='Your ProductHunt Username' onChange={(e) => setProductHuntId(e.target.value)} value={productHuntId}/>
-                    <div className='flex justify-center items-center'>
-                        <button className="btn btn-sm">Connect</button> 
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
+    <div className='px-4 py-2 rounded-lg gap-2 border bg-zinc-700 hover:bg-zinc-800 duration-500 border-gray-300 flex justify-between items-center'>
+        <span className='flex items-center'>Github <IoLogoGithub size={15} /></span>
+        <input
+            type='text'
+            placeholder='Your Github Username'
+            className='w-1/2 px-2 py-1 rounded border border-gray-300'
+            onChange={(e) => setGithubId(e.target.value)}
+            value={githubId}
+        />
     </div>
+
+    <div className='px-4 py-2 rounded-lg gap-2 border bg-sky-700 hover:bg-sky-800 duration-500 border-gray-300 flex justify-between items-center'>
+        <span className='flex items-center'>LinkedIn <FaLinkedin size={15} /></span>
+        <input
+            type='text'
+            placeholder='Your LinkedIn Username'
+            className='w-1/2 px-2 py-1 rounded border border-gray-300'
+            onChange={(e) => setLinkedinId(e.target.value)}
+            value={linkedinId}
+        />
+    </div>
+
+    <div className='px-4 py-2 rounded-lg gap-2 border bg-black border-gray-300 flex justify-between items-center'>
+        <span className='flex items-center'>Twitter <FaXTwitter size={15} /></span>
+        <input
+            type='text'
+            placeholder='Your Twitter Username'
+            className='w-1/2 px-2 py-1 rounded border border-gray-300'
+            onChange={(e) => setTwitterId(e.target.value)}
+            value={twitterId}
+        />
+    </div>
+
+    <div className='px-4 py-2 rounded-lg gap-2 border bg-pink-700 hover:bg-pink-800 duration-500 border-gray-300 flex justify-between items-center'>
+        <span className='flex items-center'>Instagram <FaInstagram size={15} /></span>
+        <input
+            type='text'
+            placeholder='Your Instagram Username'
+            className='w-1/2 px-2 py-1 rounded border border-gray-300'
+            onChange={(e) => setInstagramId(e.target.value)}
+            value={instagramId}
+        />
+    </div>
+
+    <div className='px-4 py-2 rounded-lg gap-2 border bg-red-700 hover:bg-red-800 duration-500 border-gray-300 flex justify-between items-center'>
+        <span className='flex items-center'>Youtube <IoLogoYoutube size={15} /></span>
+        <input
+            type='text'
+            placeholder='Your Youtube Channel link'
+            className='w-1/2 px-2 py-1 rounded border border-gray-300'
+            onChange={(e) => setYoutubeId(e.target.value)}
+            value={youtubeId}
+        />
+    </div>
+
+    <div className='px-4 py-2 rounded-lg gap-2 border bg-orange-700 hover:bg-orange-800 duration-500 border-gray-300 flex justify-between items-center'>
+        <span className='flex items-center'>ProductHunt <FaProductHunt size={15} /></span>
+        <input
+            type='text'
+            placeholder='Add Username'
+            className='w-1/2 px-2 py-1 rounded border border-gray-300'
+            onChange={(e) => setProductHuntId(e.target.value)}
+            value={productHuntId}
+        />
+    </div>
+    </div>
+
 
 </div>
     </div>}
@@ -456,7 +433,6 @@ export default function Dashboard() {
     </div>
   );
 }
-
 
 
 

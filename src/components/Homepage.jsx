@@ -33,8 +33,7 @@ function Homepage() {
         <div className='flex items-center gap-2'>
           <img src="/logo.png" alt="War Of Devs Logo" className='h-8 w-8' />
           <a href="#" className=' text-[16px] font-bold'>War Of Devs</a>
-          <a href="#" className=' text-[16px] ml-6 md:ml-16'>Pricing</a>
-          <a href="#" className=' text-[16px] ml-4'>Leaderboard</a>
+          <a href="/leaderboard" className=' text-[16px] ml-4'>Leaderboard</a>
         </div>
           {user? <button className="btn btn-neutral btn-sm rounded-xl font-bold" onClick={() => signOut()}>Sign out</button> : <button className="btn btn-neutral btn-sm rounded-xl font-bold" onClick={() => signIn()}>Sign in</button>}
       </nav>
