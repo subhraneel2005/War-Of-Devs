@@ -34,7 +34,7 @@ export default function Navbar() {
         <Link href="/">
           <h1 className='font-bold md:text-2xl text-xl'>War of Devs</h1>
         </Link>
-        <Link href='https://github.com/subhraneel2005/blog-buddies' target='_blank'>
+        <Link href='https://github.com/subhraneel2005/War-Of-Devs' target='_blank'>
           <Button variant="outline" className='hidden md:flex gap-2'>
             <FaGithub size={20}/>
             <p>Star on Github</p>
